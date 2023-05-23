@@ -3,9 +3,12 @@ package com.zzh.orderingsystem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModel;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -23,6 +26,7 @@ public class MainActivityCustomer extends AppCompatActivity {
     private MyFragmentStatePagerAdapter mFAdapter;
     private List<Fragment> mFragmentList;
     public ArrayList<foods> cart;
+    public Intent intentPre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +36,18 @@ public class MainActivityCustomer extends AppCompatActivity {
         mViewPager = findViewById(R.id.viewPager);
         mBottomNavigationView = findViewById(R.id.bottomNav);
 
+        intentPre = getIntent();
+        int uuid = intentPre.getIntExtra("uuid", -1);
+
         mFragmentList = new ArrayList<>();
         Fragment menu = new FragmentMenuCustomer();
         Fragment order = new FragmentOrderCustomer();
         Fragment cart = new FragmentCartCostomer();
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("uuid", uuid);
+        cart.setArguments(bundle);
+
         mFragmentList.add(menu);
         mFragmentList.add(cart);
         mFragmentList.add(order);

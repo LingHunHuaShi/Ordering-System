@@ -255,11 +255,12 @@ public class LoginMainActivity extends AppCompatActivity implements RadioGroup.O
                     // TO DO
                     // PASSING USER INFO LIKE UUID, USERNAME... TO THE NEXT ACT.
 
-
+                    intent.putExtra("uuid", user.uuid);
                     startActivity(intent);
                 }
                 else{
                     Intent intent = new Intent(LoginMainActivity.this, MainActivityCustomer.class);
+                    intent.putExtra("uuid", user.uuid);
                     startActivity(intent);
                 }
             }

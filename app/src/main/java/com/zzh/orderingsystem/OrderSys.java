@@ -11,7 +11,10 @@ import androidx.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,6 +67,20 @@ class orders{
         this.finish = finish;
         this.total = total;
         this.uuid = uuid;
+    }
+
+    orders(int order_id,String address,int phone_num,Map<String, Integer> cart,boolean finish,double total,int uuid) {
+        this.order_id = order_id;
+        this.address = address;
+        this.phone_num = phone_num;
+        this.Foods = cart;
+        this.finish = finish;
+        this.uuid = uuid;
+        this.total = total;
+
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        this.date = sdf.format(d);
     }
 
 }

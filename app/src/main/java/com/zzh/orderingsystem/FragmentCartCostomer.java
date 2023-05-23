@@ -8,13 +8,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -23,12 +26,16 @@ import java.util.Map;
 
 
 public class FragmentCartCostomer extends Fragment {
+    private int uuid;
     private MyViewModel viewModel;
     private Map<String, Integer> cart;
     private ArrayList<foods> mFoodList;
     private ArrayList<Pair<String, Integer>> cartList;
     private ListView listView;
-    private TextView tvTotalPeice;
+    private TextView tvTotalPrice;
+    private Button btnMakeOrder;
+    private DBFunction db;
+    private OrderSys orderSys;
 
     public FragmentCartCostomer() {
         // Required empty public constructor
@@ -43,6 +50,8 @@ public class FragmentCartCostomer extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        uuid = bundle.getInt("uuid");
     }
 
     @Override
@@ -52,7 +61,7 @@ public class FragmentCartCostomer extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_cart_costomer, container, false);
         viewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.NewInstanceFactory()).get(MyViewModel.class);
         cart = viewModel.raw_cart;
-        tvTotalPeice = view.findViewById(R.id.tvTotalPrice);
+        tvTotalPrice = view.findViewById(R.id.tvTotalPrice);
 
         cartList = new ArrayList<>();
         if(!cart.isEmpty()) {
@@ -63,7 +72,7 @@ public class FragmentCartCostomer extends Fragment {
         MyCartAdapter adapter = new MyCartAdapter(cartList, getContext());
         listView = view.findViewById(R.id.lvCart);
         listView.setAdapter(adapter);
-        tvTotalPeice.setText("￥"+calcPrice(adapter));
+        tvTotalPrice.setText("￥"+calcPrice(adapter));
 
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_cart);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -79,7 +88,7 @@ public class FragmentCartCostomer extends Fragment {
                 }
                 MyCartAdapter adapter = new MyCartAdapter(cartList, getContext());
                 listView.setAdapter(adapter);
-                tvTotalPeice.setText("￥"+calcPrice(adapter));
+                tvTotalPrice.setText("￥"+calcPrice(adapter));
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -99,11 +108,40 @@ public class FragmentCartCostomer extends Fragment {
                 }
                 MyCartAdapter adapter = new MyCartAdapter(cartList, getContext());
                 listView.setAdapter(adapter);
-                tvTotalPeice.setText("￥"+calcPrice(adapter));
+                tvTotalPrice.setText("￥"+calcPrice(adapter));
 
                 return true;
             }
         });
+        btnMakeOrder = view.findViewById(R.id.btnMakeOrder);
+        btnMakeOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!cartList.isEmpty()) {
+                    orderSys = new OrderSys(getContext());
+                    db = (DBFunction) orderSys;
+                    ArrayList<users> user = db.queryByUUID(uuid);
+                    Double total = Double.parseDouble(tvTotalPrice.getText().toString().substring(1));
+
+                    orders newOrder = new orders(-1, "", user.get(0).phone_num, cart,
+                            false, total, uuid);
+                    Log.d("huashi", "temp order created");
+                    db.createOrders(newOrder);
+                    Log.d("huashi", "order inserted");
+                    viewModel.raw_cart.clear();
+                    cart.clear();
+                    cartList.clear();
+                    MyCartAdapter adapter = new MyCartAdapter(cartList, getContext());
+                    listView.setAdapter(adapter);
+                    tvTotalPrice.setText("￥0.0");
+
+                    Toast.makeText(getContext(), "订单已创建！", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(getContext(), "购物车为空，请先添加商品。", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
     }
 
