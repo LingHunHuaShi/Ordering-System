@@ -40,9 +40,10 @@ public class FragmentCartCostomer extends Fragment {
     public FragmentCartCostomer() {
         // Required empty public constructor
     }
-    public static FragmentCartCostomer newInstance(String param1, String param2) {
+    public static FragmentCartCostomer newInstance(int uuid) {
         FragmentCartCostomer fragment = new FragmentCartCostomer();
         Bundle args = new Bundle();
+        args.putInt("uuid", uuid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +52,9 @@ public class FragmentCartCostomer extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
-        uuid = bundle.getInt("uuid");
+        if(bundle!=null) {
+            uuid = bundle.getInt("uuid");
+        }
     }
 
     @Override
@@ -120,10 +123,20 @@ public class FragmentCartCostomer extends Fragment {
                 if(!cartList.isEmpty()) {
                     orderSys = new OrderSys(getContext());
                     db = (DBFunction) orderSys;
-                    ArrayList<users> user = db.queryByUUID(uuid);
+//                    ArrayList<users> user = db.queryByUUID(uuid);
+                    String[] strs = {String.valueOf(uuid)};
+                    Log.d("huashi from cart fragment", "uuid:"+String.valueOf(uuid));
+                    SQLiteDatabase db2 = orderSys.getReadableDatabase();
+                    int phone_num = -2222;
+                    Cursor cur = db2.rawQuery("SELECT phone_num FROM USERS WHERE uuid = ?",strs);
+                    if(cur.moveToFirst())
+                        phone_num = cur.getInt(cur.getColumnIndexOrThrow("phone_num"));
+                    cur.close();
+                    Log.d("huashi", "phone number:"+String.valueOf(phone_num));
+
                     Double total = Double.parseDouble(tvTotalPrice.getText().toString().substring(1));
 
-                    orders newOrder = new orders(-1, "", user.get(0).phone_num, cart,
+                    orders newOrder = new orders(-1, "", phone_num, cart,
                             false, total, uuid);
                     Log.d("huashi", "temp order created");
                     db.createOrders(newOrder);

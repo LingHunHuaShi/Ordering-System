@@ -55,14 +55,16 @@ class orders{
     public double total;
 
     orders(int order_id,String address,int phone_num,String date,String[] Foods,Integer[] Foods_id,boolean finish,double total,int uuid){
-        assert (Foods.length==Foods_id.length || Foods.length==0||Foods_id.length==0);
+//        assert (Foods.length==Foods_id.length || Foods.length==0||Foods_id.length==0);
         this.order_id = order_id;
         this.address = address;
         this.phone_num = phone_num;
         this.date = date;
         this.Foods = new HashMap<>();
-        for(int i = 0;i<Foods.length;i++){
-            this.Foods.put(Foods[i],Foods_id[i]);
+        if(!(Foods==null) || !(Foods_id==null)) {
+            for (int i = 0; i < Foods.length; i++) {
+                this.Foods.put(Foods[i], Foods_id[i]);
+            }
         }
         this.finish = finish;
         this.total = total;
@@ -128,7 +130,7 @@ public class OrderSys extends SQLiteOpenHelper implements DBFunction{
             "address TEXT, " +
             "phone_num INTEGER, " +
             "date TEXT, " +
-            "Foods JSON, " +
+            "Foods TEXT, " +
             "total REAL," +
             "uuid INTEGER,"+
             "finish INTEGER)";
@@ -307,7 +309,7 @@ public class OrderSys extends SQLiteOpenHelper implements DBFunction{
 
                 Map<String, Integer> foods = new HashMap<>();
 
-                assert(foodsJson.length()==0);
+//                assert(foodsJson.length()==0);
                 JSONObject foods_ = new JSONObject(foodsJson);
                 Iterator<String> keys = foods_.keys();
                 while (keys.hasNext()) {
@@ -344,7 +346,7 @@ public class OrderSys extends SQLiteOpenHelper implements DBFunction{
 
                 Map<String, Integer> foods = new HashMap<>();
 
-                assert(foodsJson.length()==0);
+//                assert(foodsJson.length()==0);
                 JSONObject foods_ = new JSONObject(foodsJson);
                 Iterator<String> keys = foods_.keys();
                 while (keys.hasNext()) {

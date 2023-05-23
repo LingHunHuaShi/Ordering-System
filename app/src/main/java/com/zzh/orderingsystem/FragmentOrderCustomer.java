@@ -1,34 +1,44 @@
 package com.zzh.orderingsystem;
 
+import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 
 public class FragmentOrderCustomer extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1;
-    private String mParam2;
+
+    private int uuid;
+    private ListView lvOrder;
+    private OrderSys orderSys;
+    private DBFunction db;
+    private ArrayList<orders> orderList;
 
     public FragmentOrderCustomer() {
         // Required empty public constructor
     }
 
 
-    public static FragmentOrderCustomer newInstance(String param1, String param2) {
+    public static FragmentOrderCustomer newInstance(int uuid) {
         FragmentOrderCustomer fragment = new FragmentOrderCustomer();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt("uuid", uuid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -37,8 +47,7 @@ public class FragmentOrderCustomer extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            uuid = getArguments().getInt("uuid");
         }
     }
 
@@ -47,6 +56,60 @@ public class FragmentOrderCustomer extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_order_customer, container, false);
+        Log.d("huashi from frg order", "uuid:"+String.valueOf(uuid));
+        lvOrder = view.findViewById(R.id.lvOrder);
+        orderSys = new OrderSys(getContext());
+        db = (DBFunction) orderSys;
+        try {
+            orderList = db.queryOrdersByUUID(uuid);
+            Log.d("huashi", "successful query");
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+        Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+        lvOrder.setAdapter(adapter);
+
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_order);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    orderList = db.queryOrdersByUUID(uuid);
+                    Log.d("huashi", "successful query");
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+                Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+                lvOrder.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        lvOrder.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                int orderId = orderList.get(i).order_id;
+                db.Delete_order(orderId);
+
+                try {
+                    orderList = db.queryOrdersByUUID(uuid);
+                    Log.d("huashi", "successful query");
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+                Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+                lvOrder.setAdapter(adapter);
+
+                return true;
+            }
+        });
+
         return view;
     }
 }

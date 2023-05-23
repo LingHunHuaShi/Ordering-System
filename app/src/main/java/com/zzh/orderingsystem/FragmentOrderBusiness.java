@@ -3,45 +3,36 @@ package com.zzh.orderingsystem;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentOrderBusiness#newInstance} factory method to
- * create an instance of this fragment.
- */
+import org.json.JSONException;
+
+import java.util.ArrayList;
+
 public class FragmentOrderBusiness extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int uuid;
+    private ListView lvOrder;
+    private OrderSys orderSys;
+    private DBFunction db;
+    private ArrayList<orders> orderList;
 
     public FragmentOrderBusiness() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentOrderBusiness.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FragmentOrderBusiness newInstance(String param1, String param2) {
+
+    public static FragmentOrderBusiness newInstance(int uuid) {
         FragmentOrderBusiness fragment = new FragmentOrderBusiness();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt("uuid", uuid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,8 +41,7 @@ public class FragmentOrderBusiness extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            uuid = getArguments().getInt("uuid");
         }
     }
 
@@ -59,6 +49,61 @@ public class FragmentOrderBusiness extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_order_business, container, false);
+        View view = inflater.inflate(R.layout.fragment_order_customer, container, false);
+        Log.d("huashi from frg order", "uuid:"+String.valueOf(uuid));
+        lvOrder = view.findViewById(R.id.lvOrder);
+        orderSys = new OrderSys(getContext());
+        db = (DBFunction) orderSys;
+        try {
+            orderList = db.queryOrders();
+            Log.d("huashi", "successful query");
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+        Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+        lvOrder.setAdapter(adapter);
+
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_order);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    orderList = db.queryOrders();
+                    Log.d("huashi", "successful query");
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+                Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+                lvOrder.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        lvOrder.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                int orderId = orderList.get(i).order_id;
+                db.Delete_order(orderId);
+
+                try {
+                    orderList = db.queryOrders();
+                    Log.d("huashi", "successful query");
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                MyOrderAdapter adapter = new MyOrderAdapter(getContext(), orderList);
+                Log.d("huashi", "order list size: "+String.valueOf(orderList.size()));
+                lvOrder.setAdapter(adapter);
+
+                return true;
+            }
+        });
+
+        return view;
     }
 }

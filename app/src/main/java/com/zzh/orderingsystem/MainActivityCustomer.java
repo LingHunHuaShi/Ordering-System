@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -38,15 +39,15 @@ public class MainActivityCustomer extends AppCompatActivity {
 
         intentPre = getIntent();
         int uuid = intentPre.getIntExtra("uuid", -1);
-
+        Log.d("huashi from activity", "uuid:"+String.valueOf(uuid));
         mFragmentList = new ArrayList<>();
         Fragment menu = new FragmentMenuCustomer();
-        Fragment order = new FragmentOrderCustomer();
-        Fragment cart = new FragmentCartCostomer();
+        Fragment order = FragmentOrderCustomer.newInstance(uuid);
+        Fragment cart = FragmentCartCostomer.newInstance(uuid);
 
         Bundle bundle = new Bundle();
         bundle.putInt("uuid", uuid);
-        cart.setArguments(bundle);
+        order.setArguments(bundle);
 
         mFragmentList.add(menu);
         mFragmentList.add(cart);
