@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".FragmentAddMenu">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="菜品种类："
+        android:textSize="20sp"
+        android:id="@+id/tvCategory"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/rGroup"
+        app:layout_constraintTop_toTopOf="@id/rGroup"
+        app:layout_constraintBottom_toBottomOf="@id/rGroup"
+        />
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:id="@+id/rGroup"
+        app:layout_constraintLeft_toRightOf="@id/tvCategory"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvCategory"
+        >
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="主食"
+            android:id="@+id/rbMainfood"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="饮料"
+            android:layout_marginHorizontal="30dp"
+            android:id="@+id/rbDrink"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="小食"
+            android:id="@+id/rbSnack"
+            />
+    </RadioGroup>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入菜品名称"
+        app:layout_constraintTop_toBottomOf="@id/rGroup"
+        android:layout_marginHorizontal="20dp"
+        android:id="@+id/etName"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入菜品价格"
+        app:layout_constraintTop_toBottomOf="@id/etName"
+        android:layout_marginHorizontal="20dp"
+        android:id="@+id/etPrice"
+        android:inputType="numberDecimal"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入菜品简介"
+        android:id="@+id/etDescription"
+        app:layout_constraintTop_toBottomOf="@id/etPrice"
+        android:layout_marginHorizontal="20dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/etDescription"
+        android:id="@+id/btnSelectPic"
+        android:text="选择菜品图片"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:id="@+id/iv"
+        app:layout_constraintTop_toBottomOf="@id/btnSelectPic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="添加"
+        app:layout_constraintTop_toBottomOf="@id/iv"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/btnAdd"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
